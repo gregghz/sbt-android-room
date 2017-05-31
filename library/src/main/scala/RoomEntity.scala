@@ -81,7 +81,6 @@ class RoomEntityImpl(val c: Context) {
         extends { ..$earlydefns } with ..$parents { $self => ..$stats; ..$setters }"""
 
     val comp = companion.getOrElse(q"object ${tpname.toTermName}")
-    println(comp)
 
     q"$result; $comp"
   }
