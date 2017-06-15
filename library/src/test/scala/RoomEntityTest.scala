@@ -1,4 +1,4 @@
-package com.gregghz.room.entity
+package com.lucidchart.room.entity
 
 import android.arch.persistence.room._
 import org.specs2.mutable.Specification

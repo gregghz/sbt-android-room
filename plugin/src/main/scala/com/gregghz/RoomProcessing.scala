@@ -1,4 +1,4 @@
-package com.gregghz.room
+package com.lucidchart.room
 
 import java.nio.file.Files
 import sbinary.DefaultProtocol.StringFormat

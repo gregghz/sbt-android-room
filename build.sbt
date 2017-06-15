@@ -1,6 +1,23 @@
+inScope(Global)(Seq(
+  credentials += Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    sys.env.getOrElse("SONATYPE_USERNAME", ""),
+    sys.env.getOrElse("SONATYPE_PASSWORD", "")
+  ),
+  developers ++= List(
+    Developer("gregg@lucidchart.com", "Gregg Hernandez", "", url("https://github.com/gregghz"))
+  ),
+  homepage := Some(url("https://github.com/lucidsoftware/sbt-android-room")),
+  licenses += "Apache License 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"),
+  organization := "com.lucidchart",
+  PgpKeys.pgpPassphrase := Some(Array.emptyCharArray),
+  scmInfo := Some(ScmInfo(url("https://github.com/lucidsoftware/sbt-android-room"), "scm:git:git@github.com:lucidsoftware/sbt-android-room.git")),
+  version := sys.props.getOrElse("build.version", "0-SNAPSHOT")
+))
+
 lazy val common = Seq(
-  organization := "com.gregghz",
-  version := "0.0.1-SNAPSHOT",
+  organization := "com.lucidchart",
   scalacOptions ++= Seq("-deprecation", "-Xlint", "-feature", "-Xfatal-warnings")
 )
 

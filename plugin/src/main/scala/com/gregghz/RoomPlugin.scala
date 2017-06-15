@@ -1,4 +1,4 @@
-package com.gregghz.room
+package com.lucidchart.room
 
 import sbt._
 import sbt.Keys._

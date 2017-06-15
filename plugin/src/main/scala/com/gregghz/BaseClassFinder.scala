@@ -1,4 +1,4 @@
-package com.gregghz.room
+package com.lucidchart.room
 
 import org.objectweb.asm._
 import sbt._

@@ -1,4 +1,4 @@
-package com.gregghz.room.entity
+package com.lucidchart.room.entity
 
 import scala.annotation.{compileTimeOnly, implicitNotFound, StaticAnnotation}
 import scala.reflect.macros.blackbox.Context
