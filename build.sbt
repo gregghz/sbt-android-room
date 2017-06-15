@@ -16,6 +16,8 @@ inScope(Global)(Seq(
   version := sys.props.getOrElse("build.version", "0-SNAPSHOT")
 ))
 
+resolvers += "Google Maven" at "https://maven.google.com"
+
 lazy val common = Seq(
   organization := "com.lucidchart",
   scalacOptions ++= Seq("-deprecation", "-Xlint", "-feature", "-Xfatal-warnings")
