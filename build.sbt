@@ -16,8 +16,6 @@ inScope(Global)(Seq(
   version := sys.props.getOrElse("build.version", "0-SNAPSHOT")
 ))
 
-resolvers += "Google Maven" at "https://maven.google.com"
-
 lazy val common = Seq(
   organization := "com.lucidchart",
   scalacOptions ++= Seq("-deprecation", "-Xlint", "-feature", "-Xfatal-warnings")
@@ -35,6 +33,7 @@ lazy val library = project.in(file("./library")).settings(common).settings(
   scalaVersion := "2.11.8",
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
   scalacOptions += "-language:experimental.macros",
+  resolvers += "Google Maven" at "https://maven.google.com",
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided,
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
