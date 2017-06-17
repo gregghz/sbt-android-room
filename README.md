@@ -4,17 +4,17 @@
 
 This is _work in progress_. It is not currently production ready so I haven't published an artifact publically. You will need to publish locally to try it out. Key functionality is still missing. Although using it with the [Room Persistence Library documentation](https://developer.android.com/topic/libraries/architecture/room.html) seems to work well.
 
-    git clone git@github.com:gregghz/sbt-android-room.git
+    git clone git@github.com:lucidsoftware/sbt-android-room.git
     cd sbt-android-room
     sbt plugin/publishLocal library/publishLocal
 
 Then in your own project:
 
     # project/plugins.sbt
-    addSbtPlugin("com.gregghz" % "sbt-android-room" % "0.0.1-SNAPSHOT")
+    addSbtPlugin("com.lucidsoftware" % "sbt-android-room" % "0.0.1-SNAPSHOT")
 
     # build.sbt
-    libraryDependencies += "com.gregghz" %% "android-room" % "0.0.1-SNAPSHOT"
+    libraryDependencies += "com.lucidsoftware" %% "android-room" % "0.0.1-SNAPSHOT"
     addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 The [Room Persistence Library documentation](https://developer.android.com/topic/libraries/architecture/room.html) explains usage. There are a few caveats yo ushould be aware of:
