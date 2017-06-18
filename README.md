@@ -11,10 +11,10 @@ This is _work in progress_. It is not currently production ready so I haven't pu
 Then in your own project:
 
     # project/plugins.sbt
-    addSbtPlugin("com.lucidsoftware" % "sbt-android-room" % "0.0.1-SNAPSHOT")
+    addSbtPlugin("com.lucidsoftware" % "sbt-android-room" % "0-SNAPSHOT")
 
     # build.sbt
-    libraryDependencies += "com.lucidsoftware" %% "android-room" % "0.0.1-SNAPSHOT"
+    libraryDependencies += "com.lucidsoftware" %% "android-room" % "0-SNAPSHOT"
     addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 The [Room Persistence Library documentation](https://developer.android.com/topic/libraries/architecture/room.html) explains usage. There are a few caveats yo ushould be aware of:
