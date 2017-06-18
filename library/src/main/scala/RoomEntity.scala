@@ -36,8 +36,6 @@ class RoomEntityImpl(val c: Context) {
 
   private def processCaseClass(caseClass: Tree, companion: Option[Tree]): Tree = {
     // @TODO: class
-    // 1.) equals
-    // 2.) hashCode
     // 3.) copy
 
     // @TODO: companion
@@ -103,7 +101,8 @@ class RoomEntityImpl(val c: Context) {
 
   private def generateCaseClassImplementation(params: List[Tree], tpname: TypeName): List[Tree] = {
     productImplementation(params, tpname) ++
-      valueEqualityImplementation(params, tpname)
+      valueEqualityImplementation(params, tpname) ++
+      List(copyImplementation(params, tpname))
   }
 
   private def productImplementation(params: List[Tree], tpname: TypeName): List[Tree] = {
@@ -166,6 +165,23 @@ class RoomEntityImpl(val c: Context) {
     }
 
     List(hashCode, equals)
+  }
+
+  private def copyImplementation(params: List[Tree], tpname: TypeName): Tree = {
+    val names = params.map { case q"..$mods val $name: $tpe = $rhs" =>
+      name
+    }
+    val start = q"def copy(): $tpname = new $tpname(..$names)"
+
+    params.foldLeft(start) {
+      case (q"def copy(..$params): $tp1 = new $tp2(..$n)", q"..$mods val $name: $tpe = $rhs") =>
+        if (params.isEmpty) {
+          q"def copy($name: $tpe = $tpname.this.$name) = new $tpname(..$names)"
+        } else {
+          q"def copy(..$params, $name: $tpe = $tpname.this.$name) = ${tpname.toTermName}.apply(..$names)"
+        }
+
+    }
   }
 
   private def inflateCaseClassCompanion(name: TermName, params: List[Tree], companion: Option[Tree]): Tree = {

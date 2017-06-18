@@ -48,6 +48,22 @@ class RoomEntityTest extends Specification {
 
       x mustNotEqual z
     }
+
+    "copy" in {
+      val x = Thing(1, "hi")
+
+      val y = x.copy(id = 2)
+
+      y mustEqual Thing(2, "hi")
+
+      val z = x.copy(name = "hello")
+
+      z mustEqual Thing(1, "hello")
+
+      val w = x.copy(id = 10, name = "hey")
+
+      w mustEqual Thing(10, "hey")
+    }
   }
 
 }
