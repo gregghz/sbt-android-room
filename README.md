@@ -26,7 +26,26 @@ The [Room Persistence Library documentation](https://developer.android.com/topic
     @RoomEntity()
     case class Thing(@PrimaryKey id: Int, name: String)
 
-Case classes annotated with `@RoomEntity` aren't quite normal case classes (yet). They are currently missing the ability to pattern match, rely entirely on reference equality, and lack a `copy` method among other issues.
+Case classes annotated with `@RoomEntity` aren't quite normal case classes yet. The following lists enumerate which methods are missing compared to a normal case class.
+
+Instance methods:
+
+- [ ] parameterized constructor
+- [x] copy
+- [ ] productPrefix
+- [x] productArity
+- [x] productElement
+- [ ] productIterator
+- [x] canEqual
+- [x] hashCode
+- [ ] toString
+- [x] equals
+
+Companion methods:
+
+- [ ] toString
+- [x] apply
+- [ ] unapply
 
 ## @Query()
 
