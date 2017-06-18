@@ -102,6 +102,11 @@ class RoomEntityImpl(val c: Context) {
   }
 
   private def generateCaseClassImplementation(params: List[Tree], tpname: TypeName): List[Tree] = {
+    productImplementation(params, tpname) ++
+      valueEqualityImplementation(params, tpname)
+  }
+
+  private def productImplementation(params: List[Tree], tpname: TypeName): List[Tree] = {
     val productArity = q"def productArity: Int = ${params.length}"
 
     val productElement = {
@@ -111,9 +116,56 @@ class RoomEntityImpl(val c: Context) {
       q"def productElement(n: Int): Any = n match { case ..$cases; case _ => throw new java.lang.IndexOutOfBoundsException(n.toString) }"
     }
 
-    val canEqual = q"def canEqual(that: Any): Boolean = that match { case _: $tpname => true; case _ => false }"
+    val canEqual = q"def canEqual(that: Any): Boolean = that.isInstanceOf[$tpname]"
 
     List(productArity, productElement, canEqual)
+  }
+
+  private def valueEqualityImplementation(params: List[Tree], tpname: TypeName): List[Tree] = {
+
+    def conjunction(comps: List[Tree]): Tree = {
+      comps.tail.foldLeft(comps.head) { case (sofar, next) =>
+        q"$sofar && $next"
+      }
+    }
+
+    val hashCode = {
+      val baseHash = tpname.hashCode
+      val result = TermName(c.freshName)
+
+      val calc = params.map { case q"..$mods val $name: $tpe = $rhs" =>
+        q"$result = 37 * $result + $tpname.this.${name}.hashCode"
+      }
+
+      q"override def hashCode(): Int = { var $result: Int = $baseHash; ..$calc; $result }"
+    }
+
+    val equals = {
+      val that = TermName(c.freshName)
+      val eq = q"$tpname.this.eq($that.asInstanceOf[Object])"
+      val matchType = q"""
+        $that match {
+          case (_: $tpname) => true
+          case _ => false
+        }
+      """
+
+      lazy val otherName = TermName(c.freshName)
+
+      lazy val paramComps = params.map { case q"..$mods val $name: $tpe = $rhs" =>
+        q"$tpname.this.$name == $otherName.$name"
+      }
+
+      q"""override def equals($that: Any): Boolean = {
+        ($eq || $matchType) && {
+            val $otherName: $tpname = $that.asInstanceOf[$tpname]
+            ${conjunction(paramComps)}
+          }
+      }
+      """
+    }
+
+    List(hashCode, equals)
   }
 
   private def inflateCaseClassCompanion(name: TermName, params: List[Tree], companion: Option[Tree]): Tree = {

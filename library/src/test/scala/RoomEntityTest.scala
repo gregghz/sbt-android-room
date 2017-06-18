@@ -37,6 +37,17 @@ class RoomEntityTest extends Specification {
     "preserve companion object methods" in {
       Thing.f() mustEqual "f"
     }
+
+    "use value equality" in {
+      val x = Thing(1, "hi")
+      val y = Thing(1, "hi")
+
+      x mustEqual y
+
+      val z = Thing(1, "hello")
+
+      x mustNotEqual z
+    }
   }
 
 }
