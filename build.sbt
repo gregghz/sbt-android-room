@@ -41,6 +41,6 @@ lazy val library = project.in(file("./library")).settings(common).settings(
     "com.chuusai" %% "shapeless" % "2.3.2" % Test,
     "org.specs2" %% "specs2-core" % "3.8.7" % Test,
     "org.specs2" %% "specs2-mock" % "3.8.7" % Test,
-    "android.arch.persistence.room" % "runtime" % "1.0.0-alpha1" % Test
+    "android.arch.persistence.room" % "runtime" % "1.0.0-alpha3" % Test
   )
 )
