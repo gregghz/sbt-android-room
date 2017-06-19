@@ -32,10 +32,10 @@ Instance methods:
 
 - [x] parameterized constructor
 - [x] copy
-- [ ] productPrefix
+- [x] productPrefix
 - [x] productArity
 - [x] productElement
-- [ ] productIterator
+- [x] productIterator
 - [x] canEqual
 - [x] hashCode
 - [ ] toString

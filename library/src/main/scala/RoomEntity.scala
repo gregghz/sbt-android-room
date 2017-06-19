@@ -141,7 +141,19 @@ class RoomEntityImpl(val c: Context) {
 
     val canEqual = q"def canEqual(that: Any): Boolean = that.isInstanceOf[$tpname]"
 
-    List(productArity, productElement, canEqual)
+    val iterator = {
+      val names = params.map { case q"..$mods val $name: $tpe = $rhs" =>
+        q"$tpname.this.$name"
+      }
+      q"override def productIterator: Iterator[Any] = List[Any](..$names).toIterator"
+    }
+
+    val prefix = {
+      val strLiteral = q"${tpname.toString}"
+      q"override def productPrefix: String = $strLiteral"
+    }
+
+    List(productArity, productElement, canEqual, iterator, prefix)
   }
 
   private def valueEqualityImplementation(params: List[Tree], tpname: TypeName): List[Tree] = {
