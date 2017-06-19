@@ -30,7 +30,7 @@ Case classes annotated with `@RoomEntity` aren't quite normal case classes yet. 
 
 Instance methods:
 
-- [ ] parameterized constructor
+- [x] parameterized constructor
 - [x] copy
 - [ ] productPrefix
 - [x] productArity
