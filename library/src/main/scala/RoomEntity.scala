@@ -23,7 +23,7 @@ class RoomEntityImpl(val c: Context) {
         if (mods.hasFlag(Flag.CASE)) {
           processCaseClass(target.head, tail.headOption)
         } else {
-          processClass(target.head, tail.headOption)
+          processClass(target.head, tail.headOption, q"")
         }
       case _ =>
         c.abort(
@@ -35,12 +35,6 @@ class RoomEntityImpl(val c: Context) {
   }
 
   private def processCaseClass(caseClass: Tree, companion: Option[Tree]): Tree = {
-    // @TODO: class
-    // 3.) copy
-
-    // @TODO: companion
-    // 1.) unapply(..)
-
     val q"""$mods class $tpname[..$tparams] $ctorMods(..$params)
               extends { ..$earlydefns } with ..$parents { $self => ..$stats }""" = caseClass
 
@@ -53,13 +47,14 @@ class RoomEntityImpl(val c: Context) {
     val vars = valsToVars(params)
 
     val caseClassImpl = generateCaseClassImplementation(params, tpname)
+    val newCtor = constructorImplementation(params, tpname)
 
     val rawClass = q"""$newMods class $tpname[..$tparams] $ctorMods() extends { ..$earlydefns } with ..$parents { $self => ..$stats; ..$vars; ..$caseClassImpl}"""
 
-    processClass(rawClass, Some(inflateCaseClassCompanion(tpname.toTermName, params, companion)))
+    processClass(rawClass, Some(inflateCaseClassCompanion(tpname.toTermName, params, companion)), newCtor)
   }
 
-  private def processClass(caseClass: Tree, companion: Option[Tree]): Tree = {
+  private def processClass(caseClass: Tree, companion: Option[Tree], newCtor: Tree): Tree = {
     val q"""$mods class $tpname[..$tparams] $ctorMods(..$params)
               extends { ..$earlydefns } with ..$parents { $self => ..$stats }""" = caseClass
 
@@ -74,11 +69,19 @@ class RoomEntityImpl(val c: Context) {
     }
 
     val newMods = addEntityAnnotation(mods)
+    val comp = companion.getOrElse(q"object ${tpname.toTermName}")
+
+    // https://stackoverflow.com/questions/22756542/how-do-i-add-a-no-arg-constructor-to-a-scala-case-class-with-a-macro-annotation
+    val body = stats ++ setters
+    val defaultCtorPos = c.enclosingPosition
+    val newCtorPos = defaultCtorPos
+      .withEnd(defaultCtorPos.end + 1)
+      .withStart(defaultCtorPos.start + 1)
+      .withPoint(defaultCtorPos.point + 1)
+    val newBody = body :+ atPos(newCtorPos)(newCtor)
 
     val result = q"""$newMods class $tpname[..$tparams] $ctorMods(..$params)
-        extends { ..$earlydefns } with ..$parents { $self => ..$stats; ..$setters }"""
-
-    val comp = companion.getOrElse(q"object ${tpname.toTermName}")
+        extends { ..$earlydefns } with ..$parents { $self => ..$newBody }"""
 
     q"$result; $comp"
   }
@@ -103,6 +106,27 @@ class RoomEntityImpl(val c: Context) {
     productImplementation(params, tpname) ++
       valueEqualityImplementation(params, tpname) ++
       List(copyImplementation(params, tpname))
+  }
+
+  private def constructorImplementation(params: List[Tree], tpname: TypeName): Tree = {
+    val names = params.map { case q"..$mods val $name: $tpe = $rhs" =>
+      (name, tpe)
+    }
+    val setterCalls = names.map { case (name, _) =>
+      val term = TermName(s"set${name.toString.capitalize}")
+      q"$tpname.this.$term($name)"
+    }
+
+    val start = q"@android.arch.persistence.room.Ignore() def this() = { this(); ..$setterCalls }"
+
+    names.foldLeft(start) {
+      case (q"@android.arch.persistence.room.Ignore() def this(..$constParams) = { this(); ..$body }", (name, tpe)) =>
+        if (constParams.isEmpty) {
+          q"@android.arch.persistence.room.Ignore() def this($name: $tpe) = { this(); ..$body }"
+        } else {
+          q"@android.arch.persistence.room.Ignore() def this(..$constParams, $name: $tpe) = { this(); ..$body }"
+        }
+    }
   }
 
   private def productImplementation(params: List[Tree], tpname: TypeName): List[Tree] = {
@@ -168,17 +192,18 @@ class RoomEntityImpl(val c: Context) {
   }
 
   private def copyImplementation(params: List[Tree], tpname: TypeName): Tree = {
+    val term = tpname.toTermName
     val names = params.map { case q"..$mods val $name: $tpe = $rhs" =>
       name
     }
-    val start = q"def copy(): $tpname = new $tpname(..$names)"
+    val start = q"def copy(): $tpname = $term.apply(..$names)"
 
     params.foldLeft(start) {
-      case (q"def copy(..$params): $tp1 = new $tp2(..$n)", q"..$mods val $name: $tpe = $rhs") =>
+      case (q"def copy(..$params): $tp1 = $tp2(..$n)", q"..$mods val $name: $tpe = $rhs") =>
         if (params.isEmpty) {
-          q"def copy($name: $tpe = $tpname.this.$name) = new $tpname(..$names)"
+          q"def copy($name: $tpe = $tpname.this.$name) = $term.apply(..$names)"
         } else {
-          q"def copy(..$params, $name: $tpe = $tpname.this.$name) = ${tpname.toTermName}.apply(..$names)"
+          q"def copy(..$params, $name: $tpe = $tpname.this.$name) = $term.apply(..$names)"
         }
 
     }
@@ -201,7 +226,7 @@ class RoomEntityImpl(val c: Context) {
           q"$tempName.$methodName($name)"
       }
 
-      q"def apply(..$args): ${name.toTypeName} = { val $tempName = new ${name.toTypeName}(); ..$sets; $tempName}"
+      q"def apply(..$args): ${name.toTypeName} = new ${name.toTypeName}(..$args)"
     }
 
     q"$mods object $tname extends { ..$earlydefns } with ..$parents { $self => ..$body; $apply }"

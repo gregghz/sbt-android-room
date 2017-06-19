@@ -18,13 +18,27 @@ class RoomEntityTest extends Specification {
 
   "RoomEntity" should {
     "create setters" in {
-      val thing = new Thing()
+      val thing = new Thing(1, "hi")
 
       thing.setId(11)
       thing.id mustEqual 11
 
       thing.setName("hello")
       thing.name mustEqual "hello"
+    }
+
+    "have valid constructors" in {
+      val thing = new Thing(11, "hello")
+
+      thing.id mustEqual 11
+      thing.name mustEqual "hello"
+
+      val x = new Thing()
+      x.setId(11)
+      x.setName("hello")
+
+      x.id mustEqual 11
+      x.name mustEqual "hello"
     }
 
     "create apply method" in {
@@ -63,6 +77,15 @@ class RoomEntityTest extends Specification {
       val w = x.copy(id = 10, name = "hey")
 
       w mustEqual Thing(10, "hey")
+    }
+
+    "work with more than two parameters" in {
+      @RoomEntity case class Three(@PrimaryKey a: Int, b: Int, c: Int)
+
+      val x = Three(1, 2, 3)
+      x.a mustEqual 1
+      x.b mustEqual 2
+      x.c mustEqual 3
     }
   }
 
