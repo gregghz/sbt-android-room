@@ -24,6 +24,6 @@ script:
       if [ -z "$TRAVIS_TAG" ]; then
           sbt publishSigned
       else
-          sbt "sonatypeOpen sbt-scalafmt-$TRAVIS_TAG" publishSigned sonatypeReleaseAll
+          sbt "sonatypeOpen sbt-android-room-$TRAVIS_TAG" publishSigned sonatypeReleaseAll
       fi
     fi
