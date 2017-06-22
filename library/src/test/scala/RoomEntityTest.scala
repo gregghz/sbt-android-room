@@ -87,6 +87,13 @@ class RoomEntityTest extends Specification {
       x.b mustEqual 2
       x.c mustEqual 3
     }
+
+    "pass through params without blowing up" in {
+      @RoomEntity(primaryKeys = Array("id", "name"))
+      case class Other(id: Int, name: String)
+
+      success
+    }
   }
 
 }

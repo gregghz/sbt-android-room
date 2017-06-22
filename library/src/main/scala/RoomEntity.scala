@@ -4,7 +4,7 @@ import scala.annotation.{compileTimeOnly, implicitNotFound, StaticAnnotation}
 import scala.reflect.macros.blackbox.Context
 
 @compileTimeOnly("enable macro paradise to expand macro annotations")
-class RoomEntity extends StaticAnnotation {
+class RoomEntity(primaryKeys: Array[String]) extends StaticAnnotation {
 
   def macroTransform(annottees: Any*): Any = macro RoomEntityImpl.annotation
 
@@ -18,12 +18,14 @@ class RoomEntityImpl(val c: Context) {
 
     val inputs = annottees.map(_.tree).toList
 
+    val parameters = extractParams(c.prefix.tree)
+
     inputs match {
       case target @ q"$mods class $tpname[..$tparams] $ctorMods(..$params) extends { ..$earlydefns } with ..$parents { $self => ..$stats }" :: tail =>
         if (mods.hasFlag(Flag.CASE)) {
-          processCaseClass(target.head, tail.headOption)
+          processCaseClass(target.head, tail.headOption, parameters)
         } else {
-          processClass(target.head, tail.headOption, q"")
+          processClass(target.head, tail.headOption, q"", parameters)
         }
       case _ =>
         c.abort(
@@ -34,7 +36,19 @@ class RoomEntityImpl(val c: Context) {
 
   }
 
-  private def processCaseClass(caseClass: Tree, companion: Option[Tree]): Tree = {
+  private case class Params(foreignKeys: List[Tree]) {
+    def tree: Tree = q"..$foreignKeys"
+  }
+
+  private def extractParams(paramTree: Tree): Tree = {
+    paramTree match {
+      case q"new RoomEntity(..$params)" => q"..$params"
+      case q"new com.lucidchart.room.entity.RoomEntity(..$params)" => q"..$params"
+      case _ => q""
+    }
+  }
+
+  private def processCaseClass(caseClass: Tree, companion: Option[Tree], parameters: Tree): Tree = {
     val q"""$mods class $tpname[..$tparams] $ctorMods(..$params)
               extends { ..$earlydefns } with ..$parents { $self => ..$stats }""" = caseClass
 
@@ -51,10 +65,10 @@ class RoomEntityImpl(val c: Context) {
 
     val rawClass = q"""$newMods class $tpname[..$tparams] $ctorMods() extends { ..$earlydefns } with ..$parents { $self => ..$stats; ..$vars; ..$caseClassImpl}"""
 
-    processClass(rawClass, Some(inflateCaseClassCompanion(tpname.toTermName, params, companion)), newCtor)
+    processClass(rawClass, Some(inflateCaseClassCompanion(tpname.toTermName, params, companion)), newCtor, parameters)
   }
 
-  private def processClass(caseClass: Tree, companion: Option[Tree], newCtor: Tree): Tree = {
+  private def processClass(caseClass: Tree, companion: Option[Tree], newCtor: Tree, parameters: Tree): Tree = {
     val q"""$mods class $tpname[..$tparams] $ctorMods(..$params)
               extends { ..$earlydefns } with ..$parents { $self => ..$stats }""" = caseClass
 
@@ -68,7 +82,7 @@ class RoomEntityImpl(val c: Context) {
       case (methods, _) => methods
     }
 
-    val newMods = addEntityAnnotation(mods)
+    val newMods = addEntityAnnotation(mods, parameters)
     val comp = companion.getOrElse(q"object ${tpname.toTermName}")
 
     // https://stackoverflow.com/questions/22756542/how-do-i-add-a-no-arg-constructor-to-a-scala-case-class-with-a-macro-annotation
@@ -86,14 +100,15 @@ class RoomEntityImpl(val c: Context) {
     q"$result; $comp"
   }
 
-  private def addEntityAnnotation(mods: Modifiers): Modifiers = {
+  private def addEntityAnnotation(mods: Modifiers, params: Tree): Modifiers = {
     val Modifiers(flags, privateWithin, annotations) = mods
     val filteredAnnots = annotations.filter {
-      case q"new Entity()" => false
-      case q"new android.arch.persistence.room.Entity()" => false
+      case q"new Entity(..$p)" => false
+      case q"new android.arch.persistence.room.Entity(..$p)" => false
       case _ => true
     }
-    Modifiers(flags, privateWithin, q"new android.arch.persistence.room.Entity()" :: filteredAnnots)
+
+    Modifiers(flags, privateWithin, q"new android.arch.persistence.room.Entity(..$params)" :: filteredAnnots)
   }
 
   private def removeCaseMod(mods: Modifiers): Modifiers = {
