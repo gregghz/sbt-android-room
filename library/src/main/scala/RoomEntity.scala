@@ -4,7 +4,7 @@ import scala.annotation.{compileTimeOnly, implicitNotFound, StaticAnnotation}
 import scala.reflect.macros.blackbox.Context
 
 @compileTimeOnly("enable macro paradise to expand macro annotations")
-class RoomEntity(primaryKeys: Array[String]) extends StaticAnnotation {
+class RoomEntity(primaryKeys: Array[String] = Array.empty) extends StaticAnnotation {
 
   def macroTransform(annottees: Any*): Any = macro RoomEntityImpl.annotation
 
