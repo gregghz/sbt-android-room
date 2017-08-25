@@ -25,7 +25,7 @@ lazy val plugin = project.in(file("./plugin")).settings(common).settings(
   sbtPlugin := true,
   name := "sbt-android-room",
   scalaVersion := "2.10.6",
-  addSbtPlugin("org.scala-android" % "sbt-android" % "1.7.7")
+  addSbtPlugin("org.scala-android" % "sbt-android" % "1.7.9")
 )
 
 lazy val library = project.in(file("./library")).settings(common).settings(
@@ -41,6 +41,6 @@ lazy val library = project.in(file("./library")).settings(common).settings(
     "com.chuusai" %% "shapeless" % "2.3.2" % Test,
     "org.specs2" %% "specs2-core" % "3.8.7" % Test,
     "org.specs2" %% "specs2-mock" % "3.8.7" % Test,
-    "android.arch.persistence.room" % "runtime" % "1.0.0-alpha8" % Test
+    "android.arch.persistence.room" % "runtime" % "1.0.0-alpha9" % Test
   )
 )
