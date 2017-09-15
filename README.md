@@ -14,7 +14,7 @@ In your project:
     addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
     enablePlugins(AndroidApp, RoomPlugin)
 
-The [Room Persistence Library documentation](https://developer.android.com/topic/libraries/architecture/room.html) explains usage. There are a few caveats yo ushould be aware of:
+The [Room Persistence Library documentation](https://developer.android.com/topic/libraries/architecture/room.html) explains usage. There are a few caveats you should be aware of:
 
 ## @Entity()
 
