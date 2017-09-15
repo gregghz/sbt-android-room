@@ -2,15 +2,15 @@
 
 [![Build Status](https://travis-ci.org/lucidsoftware/sbt-android-room.svg)](https://travis-ci.org/lucidsoftware/sbt-android-room)
 
-This is _work in progress_. It is not currently production ready so I haven't published an artifact publically. You will need to publish locally to try it out. Key functionality is still missing. Although using it with the [Room Persistence Library documentation](https://developer.android.com/topic/libraries/architecture/room.html) seems to work well.
+This is _work in progress_. Key functionality is likely still missing. Although using it with the [Room Persistence Library documentation](https://developer.android.com/topic/libraries/architecture/room.html) seems to work well. The [Lucidchart app](https://play.google.com/store/apps/details?id=com.lucidchart.android.chart) is using it successfully in production.
 
 In your project:
 
     # project/plugins.sbt
-    addSbtPlugin("com.lucidsoftware" % "sbt-android-room" % "0.0.4")
+    addSbtPlugin("com.lucidsoftware" % "sbt-android-room" % "0.0.7")
 
     # build.sbt
-    libraryDependencies += "com.lucidsoftware" %% "android-room" % "0.0.4"
+    libraryDependencies += "com.lucidsoftware" %% "android-room" % "0.0.7"
     addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
     enablePlugins(AndroidApp, RoomPlugin)
 
