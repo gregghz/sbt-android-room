@@ -23,27 +23,6 @@ The [Room Persistence Library documentation](https://developer.android.com/topic
     @RoomEntity()
     case class Thing(@PrimaryKey id: Int, name: String)
 
-Case classes annotated with `@RoomEntity` aren't quite normal case classes yet. The following lists enumerate which methods are missing compared to a normal case class.
-
-Instance methods:
-
-- [x] parameterized constructor
-- [x] copy
-- [x] productPrefix
-- [x] productArity
-- [x] productElement
-- [x] productIterator
-- [x] canEqual
-- [x] hashCode
-- [ ] toString
-- [x] equals
-
-Companion methods:
-
-- [ ] toString
-- [x] apply
-- [ ] unapply
-
 ## @Query()
 
 In your DAOs, when you reference interpolated parameters, instead of referencing them by name, you have to reference them by `arg0`, `arg1`, etc.

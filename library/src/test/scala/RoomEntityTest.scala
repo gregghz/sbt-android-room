@@ -94,6 +94,30 @@ class RoomEntityTest extends Specification {
 
       success
     }
+
+    "toString" in {
+      @RoomEntity case class Entity(@PrimaryKey a: Int, b: String)
+
+      val x = Entity(1, "hello")
+      x.toString mustEqual "Entity(1,hello)"
+      Entity.toString mustEqual "Entity"
+    }
+
+    "unapply" in {
+      @RoomEntity case class Entity(@PrimaryKey a: Int, b: String)
+
+      val x = Entity(1, "hello")
+
+      x match {
+        case Entity(a, b) =>
+          a mustEqual 1
+          b mustEqual "hello"
+        case _ =>
+          failure
+      }
+
+      success
+    }
   }
 
 }

@@ -120,7 +120,7 @@ class RoomEntityImpl(val c: Context) {
   private def generateCaseClassImplementation(params: List[Tree], tpname: TypeName): List[Tree] = {
     productImplementation(params, tpname) ++
       valueEqualityImplementation(params, tpname) ++
-      List(copyImplementation(params, tpname))
+      List(copyImplementation(params, tpname), toStringImplementation(params, tpname))
   }
 
   private def constructorImplementation(params: List[Tree], tpname: TypeName): Tree = {
@@ -236,10 +236,19 @@ class RoomEntityImpl(val c: Context) {
     }
   }
 
+  private def toStringImplementation(params: List[Tree], tpname: TypeName): Tree = {
+    val className = q"${tpname.toTermName.toString}"
+    val names = params.map { case q"..$mods val $name: $tpe = $rhs" => q"$name.toString()" }
+    val stringifiedNames = q"""List(..$names).mkString(",")"""
+    q"""override def toString(): String = $className + "(" + $stringifiedNames + ")" """
+  }
+
   private def inflateCaseClassCompanion(name: TermName, params: List[Tree], companion: Option[Tree]): Tree = {
     val comp = companion.getOrElse(q"object $name")
 
     val q"$mods object $tname extends { ..$earlydefns } with ..$parents { $self => ..$body }" = comp
+
+    val toString = q"override def toString(): String = ${tname.toString}"
 
     val apply = {
       val args = params.map {
@@ -256,7 +265,14 @@ class RoomEntityImpl(val c: Context) {
       q"def apply(..$args): ${name.toTypeName} = new ${name.toTypeName}(..$args)"
     }
 
-    q"$mods object $tname extends { ..$earlydefns } with ..$parents { $self => ..$body; $apply }"
+    val unapply = {
+      val (names, returns) = params.map { case q"..$mods val $name: $tpe = $rhs" => (name, tpe) }.unzip
+      val returnType = tq"(..$returns)"
+      val accessingNames = names.map { name => q"obj.$name" }
+      q"def unapply(obj: ${name.toTypeName}): Option[$returnType] = if (obj == null) None else Some((..$accessingNames))"
+    }
+
+    q"$mods object $tname extends { ..$earlydefns } with ..$parents { $self => ..$body; $toString; $apply; $unapply }"
   }
 
   private def valsToVars(params: List[Tree]): List[Tree] = {
