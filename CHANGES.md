@@ -1,5 +1,8 @@
 ## New in 0.0.x ##
 
+* `0.0.10`:
+  * @RoomEntity will automatically add @NonNull to primary key fields
+
 * `0.0.9`:
   * update Room to 1.0.0-beta1
 
