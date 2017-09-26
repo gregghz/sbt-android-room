@@ -43,6 +43,7 @@ lazy val library = project.in(file("./library")).settings(common).settings(
     "org.specs2" %% "specs2-mock" % "3.8.7" % Test,
     "android.arch.persistence.room" % "runtime" % "1.0.0-beta1" % Test,
     "android.arch.lifecycle" % "runtime" % "1.0.0",
-    "android.arch.lifecycle" % "extensions" % "1.0.0-beta1" % Test
+    "android.arch.lifecycle" % "extensions" % "1.0.0-beta1" % Test,
+    "com.android.support" % "support-annotations" % "26.1.0" % Test
   )
 )

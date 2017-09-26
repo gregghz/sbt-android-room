@@ -94,10 +94,58 @@ class RoomEntityImpl(val c: Context) {
       .withPoint(defaultCtorPos.point + 1)
     val newBody = body :+ atPos(newCtorPos)(newCtor)
 
+    val bodyWithNonNullAnnots = addNonNullToPrimaryKeys(newBody, parameters)
+
     val result = q"""$newMods class $tpname[..$tparams] $ctorMods(..$params)
-        extends { ..$earlydefns } with ..$parents { $self => ..$newBody }"""
+        extends { ..$earlydefns } with ..$parents { $self => ..$bodyWithNonNullAnnots }"""
 
     q"$result; $comp"
+  }
+
+  private def addNonNullToPrimaryKeys(body: List[Tree], rawParams: Tree): List[Tree] = {
+    val pks: Set[String] = rawParams match {
+      case q"..$entityParameters" =>
+         entityParameters.flatMap {
+           case q"primaryKeys = Array(..$pks)" =>
+             pks.map { case Literal(Constant(value: String)) => value }
+           case _ => None
+        }(collection.breakOut)
+      case _ => Set.empty
+    }
+
+    body.map {
+      case q"..$mods var $name: $tpe = $rhs" =>
+        val Modifiers(flags, privateWithin, annotations) = mods
+
+        val colName = getColumnName(annotations).getOrElse(name.toString)
+
+        val newAnnotations = if (pks.contains(colName)) {
+          q"new android.support.annotation.NonNull()" :: annotations
+        } else {
+          annotations.flatMap {
+            case pk @ q"new PrimaryKey()" => List(pk, q"new android.support.annotation.NonNull()")
+            case annot => List(annot)
+          }
+        }
+
+        q"${Modifiers(flags, privateWithin, newAnnotations)} var $name: $tpe = $rhs"
+      case member => member
+    }
+  }
+
+  private def getColumnName(annotations: List[Tree]): Option[String] = {
+    annotations.foldLeft(Option.empty[String]) {
+      case (None, q"new ColumnInfo(..$params)") =>
+        params.find {
+          case q"name = $colName" => true
+          case _ => false
+        }.map {
+          case q"name = $colName" =>
+            val Literal(Constant(value: String)) = colName
+            value
+        }
+      case (sofar, _) => sofar
+    }
   }
 
   private def addEntityAnnotation(mods: Modifiers, params: Tree): Modifiers = {
