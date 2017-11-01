@@ -28,7 +28,9 @@ lazy val plugin = project.in(file("./plugin")).settings(common).settings(
   addSbtPlugin("org.scala-android" % "sbt-android" % "1.7.10")
 )
 
-lazy val library = project.in(file("./library")).settings(common).settings(
+val supportLibraryVersion = "26.1.0"
+
+lazy val library = project.in(file("./library")).enablePlugins(AndroidJar).settings(common).settings(
   name := "android-room",
   scalaVersion := "2.11.11",
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
@@ -41,9 +43,8 @@ lazy val library = project.in(file("./library")).settings(common).settings(
     "com.chuusai" %% "shapeless" % "2.3.2" % Test,
     "org.specs2" %% "specs2-core" % "3.8.7" % Test,
     "org.specs2" %% "specs2-mock" % "3.8.7" % Test,
-    "android.arch.persistence.room" % "runtime" % "1.0.0-beta1" % Test,
-    "android.arch.lifecycle" % "runtime" % "1.0.0",
-    "android.arch.lifecycle" % "extensions" % "1.0.0-beta1" % Test,
-    "com.android.support" % "support-annotations" % "26.1.0" % Test
+    "android.arch.persistence.room" % "compiler" % "1.0.0-rc1" % Provided,
+    "android.arch.lifecycle" % "extensions" % "1.0.0-rc1" % Test,
+    "com.android.support" % "support-annotations" % supportLibraryVersion % Test
   )
 )

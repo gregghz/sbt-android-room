@@ -17,8 +17,8 @@ object RoomPlugin extends AutoPlugin {
   val dependencies = Seq(
     resolvers += "Google Maven" at "https://maven.google.com",
     libraryDependencies ++= Seq(
-      "android.arch.persistence.room" % "compiler" % "1.0.0-beta1" % Provided,
-      "android.arch.persistence.room" % "runtime" % "1.0.0-beta1"
+      "android.arch.persistence.room" % "compiler" % "1.0.0-rc1" % Provided,
+      "android.arch.persistence.room" % "runtime" % "1.0.0-rc1"
     )
   )
 
