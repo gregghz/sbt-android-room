@@ -7,10 +7,10 @@ This is _work in progress_. Key functionality is likely still missing. Although 
 In your project:
 
     # project/plugins.sbt
-    addSbtPlugin("com.lucidsoftware" % "sbt-android-room" % "0.0.8")
+    addSbtPlugin("com.lucidchart" % "sbt-android-room" % "0.0.8")
 
     # build.sbt
-    libraryDependencies += "com.lucidsoftware" %% "android-room" % "0.0.8"
+    libraryDependencies += "com.lucidchart" %% "android-room" % "0.0.8"
     addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
     enablePlugins(AndroidApp, RoomPlugin)
 
