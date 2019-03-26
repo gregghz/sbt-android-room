@@ -43,8 +43,8 @@ lazy val library = project.in(file("./library")).enablePlugins(AndroidJar).setti
     "com.chuusai" %% "shapeless" % "2.3.2" % Test,
     "org.specs2" %% "specs2-core" % "3.8.7" % Test,
     "org.specs2" %% "specs2-mock" % "3.8.7" % Test,
-    "android.arch.persistence.room" % "compiler" % "1.0.0" % Provided,
-    "android.arch.lifecycle" % "extensions" % "1.0.0" % Test,
+    "android.arch.persistence.room" % "compiler" % "1.1.1" % Provided,
+    "android.arch.lifecycle" % "extensions" % "1.1.1" % Test,
     "com.android.support" % "support-annotations" % supportLibraryVersion % Test
   )
 )
