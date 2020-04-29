@@ -1,6 +1,6 @@
 # sbt-android-room
 
-[![Build Status](https://travis-ci.org/lucidsoftware/sbt-android-room.svg)](https://travis-ci.org/lucidsoftware/sbt-android-room)
+[![Build Status](https://travis-ci.com/lucidsoftware/sbt-android-room.svg)](https://travis-ci.com/lucidsoftware/sbt-android-room)
 
 This is _work in progress_. Key functionality is likely still missing. Although using it with the [Room Persistence Library documentation](https://developer.android.com/topic/libraries/architecture/room.html) seems to work well. The [Lucidchart app](https://play.google.com/store/apps/details?id=com.lucidchart.android.chart) is using it successfully in production.
 
